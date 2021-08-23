@@ -1,5 +1,8 @@
 package com.pettalk.pettalkbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,24 +13,27 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name="member")
-public class Member {
+@Builder
+@Table(name = "user")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "no")
-    private Long no;
+    @Column(name = "id")
+    private Long id;
 
-    @Column(length = 64, nullable = false)
-    private String memberId;
+    @Column(nullable = false)
+    private String userId;
 
-    @Column(length = 64, nullable = false)
+    @JsonIgnore
+    @Column(nullable = false)
     private String password;
 
-    @Column(length = 64, nullable = false)
-    private String name;
+    @Column
+    private String nickname;
 
-    @Column(length = 64, nullable = false)
+    @Column
     private String email;
 
     @CreationTimestamp
@@ -35,6 +41,4 @@ public class Member {
 
     @UpdateTimestamp
     private Date updatedAt;
-
-
 }

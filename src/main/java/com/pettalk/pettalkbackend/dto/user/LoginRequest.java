@@ -1,4 +1,4 @@
-package com.pettalk.pettalkbackend.dto.member;
+package com.pettalk.pettalkbackend.dto.user;
 
 import lombok.Data;
 
