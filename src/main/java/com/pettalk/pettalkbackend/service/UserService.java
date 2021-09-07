@@ -6,10 +6,13 @@ import com.pettalk.pettalkbackend.constants.ResultCode;
 import com.pettalk.pettalkbackend.dto.user.LoginRequest;
 import com.pettalk.pettalkbackend.dto.user.LoginResponse;
 import com.pettalk.pettalkbackend.dto.user.SignUpRequest;
+import com.pettalk.pettalkbackend.dto.user.UpdateUserRequest;
 import com.pettalk.pettalkbackend.entity.User;
 import com.pettalk.pettalkbackend.exception.PetTalkException;
-import com.pettalk.pettalkbackend.jwt.TokenProvider;
+import com.pettalk.pettalkbackend.jwt.JwtAuthToken;
+import com.pettalk.pettalkbackend.jwt.JwtAuthTokenProvider;
 import com.pettalk.pettalkbackend.repository.UserRepository;
+import com.pettalk.pettalkbackend.security.Role;
 import jdk.nashorn.internal.parser.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +21,10 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     @Autowired
-    UserRepository userRepository;
+    private JwtAuthTokenProvider jwtAuthTokenProvider;
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * 로그인
@@ -30,9 +36,11 @@ public class UserService {
         if (user == null || !user.getPassword().equals(loginRequest.getPassword())) {
             throw new PetTalkException("사용자를 찾을 수 없습니다.", ResultCode.CANNOT_FIND, null);
         }
-        TokenProvider tokenProvider = new TokenProvider();
-        String accessToken = tokenProvider.createToken(user.getUserId(), "PETTALK", "ACCESS_TOKEN");
-        return new LoginResponse(accessToken);
+//        TokenProvider tokenProvider = new TokenProvider();
+//        String accessToken = tokenProvider.createToken(user.getUserId());
+        JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.createAuthToken(user, Role.USER.getCode());
+
+        return new LoginResponse(jwtAuthToken.getToken());
     }
 
     /**
@@ -55,6 +63,31 @@ public class UserService {
                 .nickname(signUpRequest.getNickname())
                 .build();
 
+        return userRepository.save(user);
+    }
+
+    /**
+     * 회원 정보 조회
+     * @param userNo
+     * @return
+     */
+    public User getUser(long userNo) {
+        // 존재하는 사용자인지 체크
+        if (!userRepository.existsById(userNo)) {
+            throw new PetTalkException("사용자가 존재하지 않습니다", ResultCode.CANNOT_FIND, null);
+        }
+        return userRepository.findById(userNo).orElse(null);
+    }
+
+    /**
+     * 회원 정보 수정
+     * @param user 회원의 기존 정보
+     * @param updateUserRequest 수정할 회원 정보
+     */
+    public User updateUser(User user, UpdateUserRequest updateUserRequest) {
+        user.setPassword(updateUserRequest.getPassword());
+        user.setNickname(updateUserRequest.getNickname());
+        user.setEmail(updateUserRequest.getEmail());
         return userRepository.save(user);
     }
 }
