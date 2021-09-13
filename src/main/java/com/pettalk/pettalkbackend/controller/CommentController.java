@@ -35,6 +35,4 @@ public class CommentController {
         response.setData(comment);
         return response;
     }
-
-//    @PutMapping("/update/{boardType}/{boardNo}")
 }

@@ -35,6 +35,9 @@ public class Gallery {
     private int count;
 
     @Column
+    private String filename;
+
+    @Column
     private String imgPath;
 
     @CreationTimestamp

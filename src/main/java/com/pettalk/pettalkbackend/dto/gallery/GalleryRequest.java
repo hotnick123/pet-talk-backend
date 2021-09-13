@@ -6,6 +6,7 @@ import lombok.Data;
 public class GalleryRequest {
     String title;
     String content;
-    String base64Img;
+    String filename;
+    String base64;
     Long writer;
 }

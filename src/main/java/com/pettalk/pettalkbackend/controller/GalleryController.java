@@ -1,11 +1,21 @@
 package com.pettalk.pettalkbackend.controller;
 
+import com.pettalk.pettalkbackend.dto.BoardType;
 import com.pettalk.pettalkbackend.dto.PetTalkResponse;
 import com.pettalk.pettalkbackend.dto.gallery.GalleryRequest;
+import com.pettalk.pettalkbackend.entity.Comment;
 import com.pettalk.pettalkbackend.entity.Gallery;
+import com.pettalk.pettalkbackend.service.CommentService;
 import com.pettalk.pettalkbackend.service.GalleryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/gallery")
@@ -13,8 +23,12 @@ public class GalleryController {
     @Autowired
     private GalleryService galleryService;
 
+    @Autowired
+    private CommentService commentService;
+
+
     /**
-     * 게시글 등록
+     * 갤러리 게시글 등록
      * @param galleryRequest
      * @return
      */
@@ -23,6 +37,51 @@ public class GalleryController {
         PetTalkResponse<Gallery> response = new PetTalkResponse<>();
         Gallery gallery = galleryService.create(galleryRequest);
         response.setData(gallery);
+        return response;
+    }
+
+    /**
+     * 갤러리 게시글 수정
+     * @param galleryNo
+     * @param galleryRequest
+     * @return
+     */
+    @PostMapping("/update/{galleryNo}")
+    public PetTalkResponse<Gallery> update(@PathVariable long galleryNo, @RequestBody GalleryRequest galleryRequest) {
+        PetTalkResponse<Gallery> response = new PetTalkResponse<>();
+        Gallery gallery = galleryService.update(galleryNo, galleryRequest);
+        response.setData(gallery);
+        return response;
+    }
+
+    /**
+     * 갤러리 게시글 조회
+     * @param galleryNo
+     * @return
+     */
+    @GetMapping("/{galleryNo}")
+    public PetTalkResponse<Map<String, Object>> getGallery(@PathVariable long galleryNo) {
+        PetTalkResponse<Map<String, Object>> response = new PetTalkResponse<>();
+        Gallery gallery = galleryService.get(galleryNo);
+        List<Comment> comment = commentService.getComment(BoardType.GALLERY, galleryNo);
+        Map<String, Object> map = new HashMap<>();
+        map.put("gallery", gallery);
+        map.put("comment", comment);
+        response.setData(map);
+        return response;
+    }
+
+    /**
+     * 갤러리 게시글 목록 조회 (페이징)
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("/list/{page}/{size}")
+    public PetTalkResponse<Page<Gallery>> getGalleryList(@PathVariable Integer page, @PathVariable Integer size) {
+        PetTalkResponse<Page<Gallery>> response = new PetTalkResponse<>();
+        Page<Gallery> galleryList = galleryService.getGalleryList(PageRequest.of(page - 1, size, Sort.Direction.DESC, "id"));
+        response.setData(galleryList);
         return response;
     }
 }

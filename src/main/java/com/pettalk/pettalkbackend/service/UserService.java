@@ -7,15 +7,21 @@ import com.pettalk.pettalkbackend.dto.user.LoginRequest;
 import com.pettalk.pettalkbackend.dto.user.LoginResponse;
 import com.pettalk.pettalkbackend.dto.user.SignUpRequest;
 import com.pettalk.pettalkbackend.dto.user.UpdateUserRequest;
+import com.pettalk.pettalkbackend.entity.AuthToken;
 import com.pettalk.pettalkbackend.entity.User;
 import com.pettalk.pettalkbackend.exception.PetTalkException;
 import com.pettalk.pettalkbackend.jwt.JwtAuthToken;
 import com.pettalk.pettalkbackend.jwt.JwtAuthTokenProvider;
+import com.pettalk.pettalkbackend.repository.AuthTokenRepository;
 import com.pettalk.pettalkbackend.repository.UserRepository;
 import com.pettalk.pettalkbackend.security.Role;
 import jdk.nashorn.internal.parser.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -25,6 +31,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AuthTokenRepository authTokenRepository;
 
     /**
      * 로그인
@@ -36,11 +45,20 @@ public class UserService {
         if (user == null || !user.getPassword().equals(loginRequest.getPassword())) {
             throw new PetTalkException("사용자를 찾을 수 없습니다.", ResultCode.CANNOT_FIND, null);
         }
-//        TokenProvider tokenProvider = new TokenProvider();
-//        String accessToken = tokenProvider.createToken(user.getUserId());
-        JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.createAuthToken(user, Role.USER.getCode());
 
-        return new LoginResponse(jwtAuthToken.getToken());
+        JwtAuthToken jwtAuthToken = jwtAuthTokenProvider.createAuthToken(user, Role.USER.getCode());
+        UUID uuid = UUID.randomUUID();
+        String refreshToken = uuid.toString();
+
+        AuthToken authToken = AuthToken.builder()
+                    .userId(user.getId())
+                    .token(refreshToken)
+                    .expiredAt(LocalDateTime.now().plusHours(2))
+                    .build();
+
+        authTokenRepository.save(authToken);
+
+        return new LoginResponse(jwtAuthToken.getToken(), refreshToken);
     }
 
     /**
