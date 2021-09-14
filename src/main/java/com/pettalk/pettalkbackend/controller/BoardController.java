@@ -80,9 +80,9 @@ public class BoardController {
      * @return
      */
     @GetMapping("/list/{page}/{size}")
-    public PetTalkResponse<Page<Board>> getBoardList(@PathVariable Integer page, @PathVariable Integer size) {
-        PetTalkResponse<Page<Board>> response = new PetTalkResponse<>();
-        Page<Board> boardList = boardService.getBoardList(PageRequest.of(page - 1, size, Sort.Direction.DESC, "id"));
+    public PetTalkResponse<Page<Object[]>> getBoardList(@PathVariable Integer page, @PathVariable Integer size) {
+        PetTalkResponse<Page<Object[]>> response = new PetTalkResponse<>();
+        Page<Object[]> boardList = boardService.getBoardList(PageRequest.of(page - 1, size, Sort.Direction.DESC, "id"));
         response.setData(boardList);
         return response;
     }

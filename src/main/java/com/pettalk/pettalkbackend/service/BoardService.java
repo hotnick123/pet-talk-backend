@@ -73,8 +73,8 @@ public class BoardService {
      * 게시글 목록 조회 (페이징)
      * @return
      */
-    public Page<Board> getBoardList(PageRequest pageRequest) {
-        return boardRepository.findAll(pageRequest);
+    public Page<Object[]> getBoardList(PageRequest pageRequest) {
+        return boardRepository.findAllCustom(pageRequest);
     }
 
     /**
