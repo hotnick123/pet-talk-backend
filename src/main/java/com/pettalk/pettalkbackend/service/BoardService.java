@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BoardService {
     @Autowired
@@ -73,5 +75,24 @@ public class BoardService {
      */
     public Page<Board> getBoardList(PageRequest pageRequest) {
         return boardRepository.findAll(pageRequest);
+    }
+
+    /**
+     * 인기 게시글 목록 조회 (10개)
+     * @return
+     */
+    public List<Board> getPopularList() {
+        return boardRepository.findPopularList();
+    }
+
+    /**
+     * 게시글 삭제
+     * @param boardNo
+     * @return
+     */
+    public Boolean delete(long boardNo) {
+        Board board = boardRepository.findById(boardNo).orElse(null);
+        boardRepository.delete(board);
+        return true;
     }
 }

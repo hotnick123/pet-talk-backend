@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -80,7 +81,7 @@ public class GalleryService {
     public Gallery get(long galleryNo) {
         Gallery gallery = galleryRepository.findById(galleryNo).orElse(null);
         User user = userRepository.findById(gallery.getWriter()).orElse(null);
-        gallery.setWriterName(user.getNickname());
+//        gallery.setWriterName(user.getNickname());
 
         if (gallery != null) {
             gallery.setCount(gallery.getCount() + 1);
@@ -89,7 +90,18 @@ public class GalleryService {
         return gallery;
     }
 
-    public Page<Gallery> getGalleryList(PageRequest pageRequest) {
-        return galleryRepository.findAll(pageRequest);
+    public Page<Object[]> getGalleryList(PageRequest pageRequest) {
+        return galleryRepository.findAllCustom(pageRequest);
+    }
+
+    public List<Gallery> getPopularList() {
+        List<Gallery> galleryList = galleryRepository.findPopularList();
+        return galleryList;
+    }
+
+    public Boolean delete(long galleryNo) {
+        Gallery gallery = galleryRepository.findById(galleryNo).orElse(null);
+        galleryRepository.delete(gallery);
+        return true;
     }
 }

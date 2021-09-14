@@ -78,10 +78,35 @@ public class GalleryController {
      * @return
      */
     @GetMapping("/list/{page}/{size}")
-    public PetTalkResponse<Page<Gallery>> getGalleryList(@PathVariable Integer page, @PathVariable Integer size) {
-        PetTalkResponse<Page<Gallery>> response = new PetTalkResponse<>();
-        Page<Gallery> galleryList = galleryService.getGalleryList(PageRequest.of(page - 1, size, Sort.Direction.DESC, "id"));
+    public PetTalkResponse<Page<Object[]>> getGalleryList(@PathVariable Integer page, @PathVariable Integer size) {
+        PetTalkResponse<Page<Object[]>> response = new PetTalkResponse<>();
+        Page<Object[]> galleryList = galleryService.getGalleryList(PageRequest.of(page - 1, size, Sort.Direction.DESC, "id"));
         response.setData(galleryList);
+        return response;
+    }
+
+    /**
+     * 갤러리 인기 게시글 조회 (10개)
+     * @return
+     */
+    @GetMapping("/popular")
+    public PetTalkResponse<List<Gallery>> getPopularList() {
+        PetTalkResponse<List<Gallery>> response = new PetTalkResponse<>();
+        List<Gallery> galleryList = galleryService.getPopularList();
+        response.setData(galleryList);
+        return response;
+    }
+
+    /**
+     * 갤러리 게시글 삭제
+     * @param galleryNo
+     * @return
+     */
+    @DeleteMapping("/delete/{galleryNo}")
+    public PetTalkResponse<Boolean> delete(@PathVariable long galleryNo) {
+        PetTalkResponse<Boolean> response = new PetTalkResponse<>();
+        Boolean boo = galleryService.delete(galleryNo);
+        response.setData(boo);
         return response;
     }
 }

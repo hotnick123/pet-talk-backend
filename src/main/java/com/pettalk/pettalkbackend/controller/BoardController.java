@@ -5,6 +5,7 @@ import com.pettalk.pettalkbackend.dto.PetTalkResponse;
 import com.pettalk.pettalkbackend.dto.board.BoardRequest;
 import com.pettalk.pettalkbackend.entity.Board;
 import com.pettalk.pettalkbackend.entity.Comment;
+import com.pettalk.pettalkbackend.entity.Gallery;
 import com.pettalk.pettalkbackend.service.BoardService;
 import com.pettalk.pettalkbackend.service.CommentService;
 import lombok.extern.slf4j.Slf4j;
@@ -83,6 +84,31 @@ public class BoardController {
         PetTalkResponse<Page<Board>> response = new PetTalkResponse<>();
         Page<Board> boardList = boardService.getBoardList(PageRequest.of(page - 1, size, Sort.Direction.DESC, "id"));
         response.setData(boardList);
+        return response;
+    }
+
+    /**
+     * 인기 게시글 조회 (10개)
+     * @return
+     */
+    @GetMapping("/popular")
+    public PetTalkResponse<List<Board>> getPopularList() {
+        PetTalkResponse<List<Board>> response = new PetTalkResponse<>();
+        List<Board> boardList = boardService.getPopularList();
+        response.setData(boardList);
+        return response;
+    }
+
+    /**
+     * 게시글 삭제
+     * @param boardNo
+     * @return
+     */
+    @DeleteMapping("/delete/{boardNo}")
+    public PetTalkResponse<Boolean> delete(@PathVariable long boardNo) {
+        PetTalkResponse<Boolean> response = new PetTalkResponse<>();
+        Boolean boo = boardService.delete(boardNo);
+        response.setData(boo);
         return response;
     }
 }

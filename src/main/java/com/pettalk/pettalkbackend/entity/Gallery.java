@@ -45,6 +45,4 @@ public class Gallery {
 
     @UpdateTimestamp
     private Date updatedAt;
-
-    private String writerName;
 }
