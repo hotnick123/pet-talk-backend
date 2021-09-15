@@ -62,8 +62,8 @@ public class GalleryController {
     @GetMapping("/{galleryNo}")
     public PetTalkResponse<Map<String, Object>> getGallery(@PathVariable long galleryNo) {
         PetTalkResponse<Map<String, Object>> response = new PetTalkResponse<>();
-        Gallery gallery = galleryService.get(galleryNo);
-        List<Comment> comment = commentService.getComment(BoardType.GALLERY, galleryNo);
+        Map<String, Object> gallery = galleryService.get(galleryNo);
+        List<Object[]> comment = commentService.getComment(BoardType.GALLERY, galleryNo);
         Map<String, Object> map = new HashMap<>();
         map.put("gallery", gallery);
         map.put("comment", comment);
@@ -107,6 +107,14 @@ public class GalleryController {
         PetTalkResponse<Boolean> response = new PetTalkResponse<>();
         Boolean boo = galleryService.delete(galleryNo);
         response.setData(boo);
+        return response;
+    }
+
+    @DeleteMapping("/delete/image/{galleryNo}")
+    public PetTalkResponse<Gallery> deleteImage(@PathVariable long galleryNo) {
+        PetTalkResponse<Gallery> response = new PetTalkResponse<>();
+        Gallery gallery = galleryService.deleteImage(galleryNo);
+        response.setData(gallery);
         return response;
     }
 }

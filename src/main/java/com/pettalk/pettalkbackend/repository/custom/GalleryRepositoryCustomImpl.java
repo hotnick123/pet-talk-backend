@@ -1,18 +1,12 @@
 package com.pettalk.pettalkbackend.repository.custom;
 
-import com.pettalk.pettalkbackend.entity.Gallery;
-import com.pettalk.pettalkbackend.entity.QComment;
-import com.pettalk.pettalkbackend.entity.QGallery;
-import com.pettalk.pettalkbackend.entity.QUser;
+import com.pettalk.pettalkbackend.entity.*;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +16,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -63,6 +60,28 @@ public class GalleryRepositoryCustomImpl implements GalleryRepositoryCustom {
                 .fetchResults();
         List<Gallery> content = results.getResults();
         return content;
+    }
+
+    @Override
+    public Map<String, Object> findByCustom(long galleryNo) {
+        QueryResults<Tuple> results = queryFactory
+                .select(gallery, user)
+                .from(gallery)
+                .join(user)
+                .on(gallery.writer.eq(user.id))
+                .where(gallery.id.eq(galleryNo))
+                .fetchResults();
+        List<Tuple> content = results.getResults();
+        Map<String, Object> map = new HashMap<String, Object>();
+        Gallery gallery = null;
+        User user = null;
+        for (Tuple tuple : content) {
+            gallery = tuple.get(0, Gallery.class);
+            user = tuple.get(1, User.class);
+        }
+        map.put("user", user);
+        map.put("gallery", gallery);
+        return map;
     }
 
     private List<OrderSpecifier> getOrderSpecifier(Sort sort) {

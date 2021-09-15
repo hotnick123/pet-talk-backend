@@ -1,6 +1,7 @@
 package com.pettalk.pettalkbackend.service;
 
 import com.pettalk.pettalkbackend.dto.BoardType;
+import com.pettalk.pettalkbackend.dto.comment.CommentModifyRequest;
 import com.pettalk.pettalkbackend.dto.comment.CommentRequest;
 import com.pettalk.pettalkbackend.entity.Comment;
 import com.pettalk.pettalkbackend.repository.CommentRepository;
@@ -24,7 +25,19 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public List<Comment> getComment(BoardType boardType, Long boardNo) {
-        return commentRepository.findByBoardTypeAndBoardNo(boardType, boardNo);
+    public List<Object[]> getComment(BoardType boardType, Long boardNo) {
+        return commentRepository.findByBoardTypeAndBoardNoCustom(boardType, boardNo);
+    }
+
+    public Boolean delete(long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElse(null);
+        commentRepository.delete(comment);
+        return true;
+    }
+
+    public Comment modify(long commentId, CommentModifyRequest commentModifyRequest) {
+        Comment comment = commentRepository.findById(commentId).orElse(null);
+        comment.setContent(commentModifyRequest.getContent());
+        return commentRepository.save(comment);
     }
 }

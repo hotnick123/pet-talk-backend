@@ -65,7 +65,7 @@ public class BoardController {
     public PetTalkResponse<Map<String, Object>> getBoard(@PathVariable long boardNo) {
         PetTalkResponse<Map<String, Object>> response = new PetTalkResponse<>();
         Board board = boardService.get(boardNo);
-        List<Comment> comment = commentService.getComment(BoardType.COMMUNITY, boardNo);
+        List<Object[]> comment = commentService.getComment(BoardType.COMMUNITY, boardNo);
         Map<String, Object> map = new HashMap<>();
         map.put("board", board);
         map.put("comment", comment);

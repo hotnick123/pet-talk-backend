@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -62,30 +63,25 @@ public class GalleryService {
             try {
                 FileOutputStream fos = new FileOutputStream(file);
                 fos.write(decoder);
-
                 String imgPath = s3Uploader.upload(file, "gallery");
-                gallery.setTitle(galleryRequest.getTitle());
-                gallery.setContent(galleryRequest.getContent());
                 gallery.setFilename(galleryRequest.getFilename());
                 gallery.setImgPath(imgPath);
-                galleryRepository.save(gallery);
-                return gallery;
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        gallery.setTitle(galleryRequest.getTitle());
+        gallery.setContent(galleryRequest.getContent());
+        galleryRepository.save(gallery);
         return gallery;
     }
 
-    public Gallery get(long galleryNo) {
-        Gallery gallery = galleryRepository.findById(galleryNo).orElse(null);
-        User user = userRepository.findById(gallery.getWriter()).orElse(null);
-//        gallery.setWriterName(user.getNickname());
-
+    public Map<String, Object> get(long galleryNo) {
+        Map<String, Object> gallery = galleryRepository.findByCustom(galleryNo);
         if (gallery != null) {
-            gallery.setCount(gallery.getCount() + 1);
-            galleryRepository.save(gallery);
+            Gallery gallery1 = galleryRepository.findById(galleryNo).orElse(null);
+            gallery1.setCount(gallery1.getCount() + 1);
+            galleryRepository.save(gallery1);
         }
         return gallery;
     }
@@ -103,5 +99,12 @@ public class GalleryService {
         Gallery gallery = galleryRepository.findById(galleryNo).orElse(null);
         galleryRepository.delete(gallery);
         return true;
+    }
+
+    public Gallery deleteImage(long galleryNo) {
+        Gallery gallery = galleryRepository.findById(galleryNo).orElse(null);
+        gallery.setFilename(null);
+        gallery.setImgPath(null);
+        return galleryRepository.save(gallery);
     }
 }
